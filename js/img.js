@@ -7,7 +7,13 @@ function clear_images() {
 }
 
 function submit_images() {
-	
+	// const canvas = document.createElement('canvas');
+	// canvas.setAttribute('class', 'collage');
+	const canvas = document.getElementById('collage');
+	ctx = canvas.getContext('2d');
+	collage_image = new Image();
+	collage_image.src = img_list[0].src;
+	ctx.drawImage(collage_image, 0, 0);
 }
 
 function display_img(img) {
@@ -19,7 +25,7 @@ function display_img(img) {
 		image.src = e.target.result;
 		const main = document.querySelector('main');
 		main.appendChild(image);
-		img_list.push(e.target.result);
+		img_list.push(image);
 	}
 
 	reader.readAsDataURL(img.files[0])

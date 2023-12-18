@@ -6,4 +6,5 @@ i wanna make a collage
 - ~~display image~~(s)
 - create image by combining images
 - download img
+- interact with canvas to move/scale images
 - combine in nice ways
