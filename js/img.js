@@ -5,6 +5,10 @@ var img_poss = []
 var moving = false;
 var last_x = 0;
 var last_y = 0;
+var collage_image_w = 200;
+var collage_image_h = 200;
+var collage_poss = [];
+var moving_image = -1;
 
 function clear_canvas() {
 	const canvas = document.getElementById('collage');
@@ -18,14 +22,22 @@ function clear_images() {
 	clear_canvas();
 	const main = document.querySelector('main')
 	main.innerHTML = "";
-	img_list = [];
+
+	img_list = []
+	canvas_default_w = 200;
+	canvas_default_h = 200;
+	img_poss = []
+	moving = false;
+	last_x = 0;
+	last_y = 0;
 }
 
 function draw(canvas, ctx) {
 	for (let i = 0; i < img_list.length; i++) {
 		collage_image = new Image();
 		collage_image.src = img_list[i].src;
-		ctx.drawImage(collage_image, img_poss[i][0], img_poss[i][1]);
+		// ctx.drawImage(collage_image, img_poss[i][0], img_poss[i][1]);
+		ctx.drawImage(collage_image, img_poss[i][0], img_poss[i][1], collage_image_w, collage_image_h, collage_poss[i][0], collage_poss[i][1], collage_image_w, collage_image_h);
 	}
 }
 
@@ -35,28 +47,42 @@ function init() {
 	canvas.width = canvas_default_w;
 	canvas.height = canvas_default_h;
 
-	canvas.addEventListener('mousedown', function(event) {
+	window.addEventListener('mousedown', function(event) {
 		// console.log("mousedown")
 		moving = true;
 		last_x = event.offsetX;
 		last_y = event.offsetY;
+		// find img to move
+		moving_image = which_image_clicked(event.offsetX, event.offsetY);
 	}, false);
-	canvas.addEventListener('mouseup', function(event) {
+	window.addEventListener('mouseup', function(event) {
 		// console.log("mouseup")
 		moving = false;
+		moving_image = -1;
 	}, false);
-	canvas.addEventListener('mousemove', function(event) {
+	window.addEventListener('mousemove', function(event) {
 		// console.log("mousemove")
 		if (moving) {
-			let diff_x = event.offsetX - last_x;
-			diff_y = event.offsetY - last_y;
-			if (img_poss.length > 0) {
-				img_poss[0][0] += diff_x;
-				img_poss[0][1] += diff_y;
+			// move if image to move
+			if (moving_image >= 0) {
+				let diff_x = event.clientX - last_x;
+				diff_y = event.clientY - last_y;
+				if (img_poss.length > 0) {
+					img_poss[moving_image][0] -= diff_x;
+					img_poss[moving_image][1] -= diff_y;
+					if (img_poss[moving_image][0] < 0) {img_poss[moving_image][0] = 0;}
+					if (img_poss[moving_image][1] < 0) {img_poss[moving_image][1] = 0;}
+					if (img_poss[moving_image][0] > img_list[moving_image].width - collage_image_w) {
+						img_poss[moving_image][0] = img_list[moving_image].width - collage_image_w;
+					}
+					if (img_poss[moving_image][1] > img_list[moving_image].height - collage_image_h) {
+						img_poss[moving_image][1] = img_list[moving_image].height - collage_image_h;
+					}
+				}
+				last_x = event.clientX;
+				last_y = event.clientY;
+				draw(canvas, ctx);
 			}
-			last_x = event.offsetX;
-			last_y = event.offsetY;
-			draw(canvas, ctx);
 		}
 	}, false);
 }
@@ -68,11 +94,11 @@ function submit_images() {
 
 	var img_num = img_list.length;
 	var canvas_w = 0;
-	var canvas_h = 0;
+	var canvas_h = collage_image_h;
 	for (let i = 0; i < img_num; i++) {
-		img_poss.push([canvas_w, 0]);
-		canvas_w += img_list[i].width;
-		if (canvas_h < img_list[i].height) {canvas_h = img_list[i].height;}
+		img_poss.push([0,0]);
+		collage_poss.push([canvas_w, 0]);
+		canvas_w += collage_image_w;
 	}
 
 	canvas.width = canvas_w;
@@ -97,4 +123,17 @@ function display_img(img) {
 	}
 
 	reader.readAsDataURL(img.files[0])
+}
+
+function which_image_clicked(x_pos, y_pos) {
+	// console.log("finding image at: ", x_pos, y_pos);
+	// console.log("images available: ", collage_poss);
+	for (let i = 0; i < collage_poss.length; i++) {
+		// console.log(i, " failing at: ", x_pos > collage_poss[i][0], y_pos > collage_poss[i][1], x_pos < collage_poss[i][0] + collage_image_w, y_pos < collage_poss[i][1] + collage_image_h)
+		if (x_pos > collage_poss[i][0] && y_pos > collage_poss[i][1] && x_pos < collage_poss[i][0] + collage_image_w && y_pos < collage_poss[i][1] + collage_image_h) {
+			console.log("found!");
+			return i;
+		}
+	}
+	return -1;
 }
