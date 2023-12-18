@@ -7,7 +7,11 @@ var last_x = 0;
 var last_y = 0;
 var collage_poss = [];
 var collage_sizes = [];
+var collage_scales = [];
+var max_scale = 5;
+var min_scale = 0.1;
 var moving_image = -1;
+var wheelscroll_scale = 0.01;
 
 function clear_canvas() {
 	const canvas = document.getElementById('collage');
@@ -31,6 +35,7 @@ function clear_images() {
 	last_y = 0;
 	collage_poss = [];
 	collage_sizes = [];
+	collage_scales = [];
 	moving_image = -1;
 }
 
@@ -39,7 +44,7 @@ function draw(canvas, ctx) {
 		collage_image = new Image();
 		collage_image.src = img_list[i].src;
 		// console.log(img_poss[i][0], img_poss[i][1], collage_sizes[i][0], collage_sizes[i][1], collage_poss[i][0], collage_poss[i][1], collage_sizes[i][0], collage_sizes[i][1]);
-		ctx.drawImage(collage_image, img_poss[i][0], img_poss[i][1], collage_sizes[i][0], collage_sizes[i][1], collage_poss[i][0], collage_poss[i][1], collage_sizes[i][0], collage_sizes[i][1]);
+		ctx.drawImage(collage_image, img_poss[i][0], img_poss[i][1], collage_sizes[i][0]/collage_scales[i], collage_sizes[i][1]/collage_scales[i], collage_poss[i][0], collage_poss[i][1], collage_sizes[i][0], collage_sizes[i][1]);
 	}
 }
 
@@ -70,16 +75,16 @@ function init() {
 				let diff_x = event.clientX - last_x;
 				diff_y = event.clientY - last_y;
 				if (img_poss.length > 0) {
-					img_poss[moving_image][0] -= diff_x;
-					img_poss[moving_image][1] -= diff_y;
-					if (img_poss[moving_image][0] < 0) {img_poss[moving_image][0] = 0;}
-					if (img_poss[moving_image][1] < 0) {img_poss[moving_image][1] = 0;}
-					if (img_poss[moving_image][0] > img_list[moving_image].width - collage_sizes[moving_image][0]) {
-						img_poss[moving_image][0] = img_list[moving_image].width - collage_sizes[moving_image][0];
-					}
-					if (img_poss[moving_image][1] > img_list[moving_image].height - collage_sizes[moving_image][1]) {
-						img_poss[moving_image][1] = img_list[moving_image].height - collage_sizes[moving_image][1];
-					}
+					img_poss[moving_image][0] -= diff_x/collage_scales[moving_image];
+					img_poss[moving_image][1] -= diff_y/collage_scales[moving_image];
+					// if (img_poss[moving_image][0] < 0) {img_poss[moving_image][0] = 0;}
+					// if (img_poss[moving_image][1] < 0) {img_poss[moving_image][1] = 0;}
+					// if (img_poss[moving_image][0] > img_list[moving_image].width - collage_sizes[moving_image][0]) {
+					// 	img_poss[moving_image][0] = img_list[moving_image].width - collage_sizes[moving_image][0];
+					// }
+					// if (img_poss[moving_image][1] > img_list[moving_image].height - collage_sizes[moving_image][1]) {
+					// 	img_poss[moving_image][1] = img_list[moving_image].height - collage_sizes[moving_image][1];
+					// }
 				}
 				last_x = event.clientX;
 				last_y = event.clientY;
@@ -87,6 +92,18 @@ function init() {
 			}
 		}
 	}, false);
+	var wheel_eventlistener = function(event) {
+		moving_image = which_image_clicked(last_x, last_y);
+		collage_scales[moving_image] += wheelscroll_scale*event.deltaY;
+		if (collage_scales[moving_image] > max_scale) {
+			collage_scales[moving_image] = max_scale;
+		}
+		if (collage_scales[moving_image] < min_scale) {
+			collage_scales[moving_image] = min_scale;
+		}
+		draw(canvas, ctx);
+	};
+	canvas.addEventListener('wheel',wheel_eventlistener,false);
 }
 
 function display_img(img) {
@@ -168,6 +185,7 @@ function set_image_pos_and_size(len) {
 			let img_x = j * (canvas_default_w/row_cols);
 			collage_poss.push([img_x, row_y]);
 			collage_sizes.push([canvas_default_w/row_cols, canvas_default_h/num_cols.length]);
+			collage_scales.push(1);
 			img_poss.push([0,0]);
 		}
 	}
@@ -175,7 +193,7 @@ function set_image_pos_and_size(len) {
 }
 
 function submit_images() {
-	clear_images();
+	clear_canvas();
 	const canvas = document.getElementById('collage');
 	ctx = canvas.getContext('2d');
 
@@ -194,7 +212,7 @@ function submit_images() {
 function which_image_clicked(x_pos, y_pos) {
 	for (let i = 0; i < collage_poss.length; i++) {
 		if (x_pos > collage_poss[i][0] && y_pos > collage_poss[i][1] && x_pos < collage_poss[i][0] + collage_sizes[i][0] && y_pos < collage_poss[i][1] + collage_sizes[i][1]) {
-			console.log("found!");
+			// console.log("found!");
 			return i;
 		}
 	}
