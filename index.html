@@ -4,7 +4,7 @@
         <link rel="stylesheet" href="style.css">
         <script type="text/javascript" src="js/img.js"></script>
     </head>
-    <body>
+    <body onload="init();">
         <canvas id="collage" class="collage"></canvas>
         <input type="file" onchange="display_img(this);">
         <button onclick="clear_images()">Clear</button>
