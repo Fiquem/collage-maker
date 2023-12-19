@@ -6,7 +6,7 @@
     </head>
     <body onload="init();">
         <canvas id="collage" class="collage"></canvas>
-        <input type="file" onchange="display_img(this);">
+        <input type="file" multiple accept="image/*" onchange="display_img(this);">
         <button onclick="clear_images()">Clear</button>
         <button onclick="submit_images()">Submit</button>
         <main>

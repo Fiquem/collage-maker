@@ -106,22 +106,24 @@ function init() {
 	canvas.addEventListener('wheel',wheel_eventlistener,false);
 }
 
-function display_img(img) {
-	var reader = new FileReader();
+function display_img(input_images) {
+	for (let i = 0; i < input_images.files.length; i++) {
+		var reader = new FileReader();
 
-	reader.onload = function (e) {
-		var image = document.createElement('img');
-		image.src = e.target.result;
-		img_list.push(image);
+		reader.onload = function (e) {
+			var image = document.createElement('img');
+			image.src = e.target.result;
+			img_list.push(image);
 
-		var preview_image = document.createElement('img');
-		preview_image.setAttribute('class', 'upload-preview');
-		preview_image.src = e.target.result;
-		const main = document.querySelector('main');
-		main.appendChild(preview_image);
+			var preview_image = document.createElement('img');
+			preview_image.setAttribute('class', 'upload-preview');
+			preview_image.src = e.target.result;
+			const main = document.querySelector('main');
+			main.appendChild(preview_image);
+		}
+
+		reader.readAsDataURL(input_images.files[i]);
 	}
-
-	reader.readAsDataURL(img.files[0])
 }
 
 function set_image_pos_and_size(len) {
