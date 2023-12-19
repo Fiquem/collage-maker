@@ -20,3 +20,4 @@ i wanna make a collage
 - ~~scale doesn't focus currently hovered image, just last clicked~~
 - gets real slow with 9 medium-large images
 - the scroll doesn't actually choose correctly, gotta get that for canvas not window (scrolling down breaks)
+- oh this is like full broken on pc
