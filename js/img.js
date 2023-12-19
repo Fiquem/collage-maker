@@ -40,6 +40,16 @@ function clear_images() {
 	moving_image = -1;
 }
 
+function download_image(){
+	const canvas = document.getElementById('collage');
+	// var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+	const link = document.createElement('a');
+	link.download = 'download.png';
+	link.href = canvas.toDataURL();
+	link.click();
+	link.delete;
+}
+
 function draw(canvas, ctx) {
 	for (let i = 0; i < img_list.length; i++) {
 		collage_image = new Image();
