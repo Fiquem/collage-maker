@@ -12,6 +12,7 @@ var max_scale = 5;
 var min_scale = 0.1;
 var moving_image = -1;
 var wheelscroll_scale = 0.01;
+var mouse_pos = [];
 
 function clear_canvas() {
 	const canvas = document.getElementById('collage');
@@ -60,7 +61,7 @@ function init() {
 		last_x = event.offsetX;
 		last_y = event.offsetY;
 		// find img to move
-		moving_image = which_image_clicked(event.offsetX, event.offsetY);
+		moving_image = which_image_clicked(mouse_pos);
 	}, false);
 	window.addEventListener('mouseup', function(event) {
 		// console.log("mouseup")
@@ -69,6 +70,7 @@ function init() {
 	}, false);
 	window.addEventListener('mousemove', function(event) {
 		// console.log("mousemove")
+		mouse_pos = [event.clientX, event.clientY];
 		if (moving) {
 			// move if image to move
 			if (moving_image >= 0) {
@@ -93,7 +95,7 @@ function init() {
 		}
 	}, false);
 	var wheel_eventlistener = function(event) {
-		moving_image = which_image_clicked(last_x, last_y);
+		moving_image = which_image_clicked(mouse_pos);
 		collage_scales[moving_image] += wheelscroll_scale*event.deltaY;
 		if (collage_scales[moving_image] > max_scale) {
 			collage_scales[moving_image] = max_scale;
@@ -211,7 +213,7 @@ function submit_images() {
 	draw(canvas, ctx);
 }
 
-function which_image_clicked(x_pos, y_pos) {
+function which_image_clicked([x_pos, y_pos]) {
 	for (let i = 0; i < collage_poss.length; i++) {
 		if (x_pos > collage_poss[i][0] && y_pos > collage_poss[i][1] && x_pos < collage_poss[i][0] + collage_sizes[i][0] && y_pos < collage_poss[i][1] + collage_sizes[i][1]) {
 			// console.log("found!");

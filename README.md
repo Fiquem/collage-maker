@@ -9,8 +9,8 @@ i wanna make a collage
 - ~~interact with canvas to move images~~
 - ~~interact with canvas to scale images~~
 - combine in nice ways
-- upload multiple images at once
+- ~~upload multiple images at once~~
 
 ## bugs
 - ~~if image is smaller than canvas (or i mb area of canvas it's given?)~~
-- scale doesn't focus currently hovered image, just last clicked
+- ~~scale doesn't focus currently hovered image, just last clicked~~
