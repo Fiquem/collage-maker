@@ -1,6 +1,6 @@
 var img_list = []
-var canvas_default_w = 500;
-var canvas_default_h = 500;
+var canvas_default_w = 800;
+var canvas_default_h = 800;
 var img_poss = []
 var moving = false;
 var last_x = 0;
@@ -28,8 +28,8 @@ function clear_images() {
 	main.innerHTML = "";
 
 	img_list = []
-	canvas_default_w = 500;
-	canvas_default_h = 500;
+	canvas_default_w = 800;
+	canvas_default_h = 800;
 	img_poss = []
 	moving = false;
 	last_x = 0;
