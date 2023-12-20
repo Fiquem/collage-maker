@@ -1,18 +1,40 @@
 var img_list = []
 var canvas_default_w = 800;
 var canvas_default_h = 800;
-var img_poss = []
+var img_poss = [] // position of where image starts displaying in collage box
 var moving = false;
 var last_x = 0;
 var last_y = 0;
-var collage_poss = [];
-var collage_sizes = [];
-var collage_scales = [];
-var max_scale = 5;
+var collage_poss = []; // position of box within canvas
+var collage_sizes = []; // size of box within canvas
+var collage_scales = []; // mb should be img_scales?
+var max_scale = 3;
 var min_scale = 0.1;
 var moving_image = -1;
 var wheelscroll_scale = 0.01;
 var mouse_pos = [];
+
+function check_image_fit(img_i) {
+	// make sure image fits in box
+
+	// if scaled too small, rescale
+	if (collage_scales[img_i] > img_list[img_i].width/collage_sizes[img_i][0]) {
+		collage_scales[img_i] = img_list[img_i].width/collage_sizes[img_i][0];
+	}
+	if (collage_scales[img_i] > img_list[img_i].height/collage_sizes[img_i][1]) {
+		collage_scales[img_i] = img_list[img_i].height/collage_sizes[img_i][1];
+	}
+
+	// if moved outside of box, move back
+	if (img_poss[img_i][0] < 0) {img_poss[img_i][0] = 0;}
+	if (img_poss[img_i][1] < 0) {img_poss[img_i][1] = 0;}
+	if (img_poss[img_i][0] > (img_list[img_i].width/collage_scales[img_i]) - collage_sizes[img_i][0]) {
+		img_poss[img_i][0] = (img_list[img_i].width/collage_scales[img_i]) - collage_sizes[img_i][0];
+	}
+	if (img_poss[img_i][1] > (img_list[img_i].height/collage_scales[img_i]) - collage_sizes[img_i][1]) {
+		img_poss[img_i][1] = (img_list[img_i].height/collage_scales[img_i]) - collage_sizes[img_i][1];
+	}
+}
 
 function clear_canvas() {
 	const canvas = document.getElementById('collage');
@@ -51,11 +73,12 @@ function download_image(){
 }
 
 function draw(canvas, ctx) {
+	clear_canvas();
 	for (let i = 0; i < img_list.length; i++) {
 		collage_image = new Image();
 		collage_image.src = img_list[i].src;
 		// console.log(img_poss[i][0], img_poss[i][1], collage_sizes[i][0], collage_sizes[i][1], collage_poss[i][0], collage_poss[i][1], collage_sizes[i][0], collage_sizes[i][1]);
-		ctx.drawImage(collage_image, img_poss[i][0], img_poss[i][1], collage_sizes[i][0]/collage_scales[i], collage_sizes[i][1]/collage_scales[i], collage_poss[i][0], collage_poss[i][1], collage_sizes[i][0], collage_sizes[i][1]);
+		ctx.drawImage(collage_image, img_poss[i][0]*collage_scales[i], img_poss[i][1]*collage_scales[i], collage_sizes[i][0]*collage_scales[i], collage_sizes[i][1]*collage_scales[i], collage_poss[i][0], collage_poss[i][1], collage_sizes[i][0], collage_sizes[i][1]);
 	}
 }
 
@@ -65,14 +88,6 @@ function init() {
 	canvas.width = canvas_default_w;
 	canvas.height = canvas_default_h;
 
-	// window.addEventListener('mousedown', function(event) {
-	// 	// console.log("mousedown")
-	// 	moving = true;
-	// 	last_x = event.offsetX;
-	// 	last_y = event.offsetY;
-	// 	// find img to move
-	// 	moving_image = which_image_clicked(mouse_pos);
-	// }, false);
 	canvas.addEventListener('mousedown', function(event) {
 		// console.log("mousedown")
 		moving = true;
@@ -96,14 +111,7 @@ function init() {
 				if (img_poss.length > 0) {
 					img_poss[moving_image][0] -= diff_x/collage_scales[moving_image];
 					img_poss[moving_image][1] -= diff_y/collage_scales[moving_image];
-					// if (img_poss[moving_image][0] < 0) {img_poss[moving_image][0] = 0;}
-					// if (img_poss[moving_image][1] < 0) {img_poss[moving_image][1] = 0;}
-					// if (img_poss[moving_image][0] > img_list[moving_image].width - collage_sizes[moving_image][0]) {
-					// 	img_poss[moving_image][0] = img_list[moving_image].width - collage_sizes[moving_image][0];
-					// }
-					// if (img_poss[moving_image][1] > img_list[moving_image].height - collage_sizes[moving_image][1]) {
-					// 	img_poss[moving_image][1] = img_list[moving_image].height - collage_sizes[moving_image][1];
-					// }
+					check_image_fit(moving_image);
 				}
 				last_x = event.clientX;
 				last_y = event.clientY;
@@ -116,15 +124,19 @@ function init() {
 		mouse_pos = [event.offsetX, event.offsetY];
 	}, false);
 	var wheel_eventlistener = function(event) {
-		moving_image = which_image_clicked(mouse_pos);
-		collage_scales[moving_image] += wheelscroll_scale*event.deltaY;
-		if (collage_scales[moving_image] > max_scale) {
-			collage_scales[moving_image] = max_scale;
+		if (img_poss.length > 0) { // only do anything if there are images
+			event.preventDefault(); // oh is this what stops page scrolling? yup lol
+			moving_image = which_image_clicked(mouse_pos);
+			collage_scales[moving_image] += wheelscroll_scale*event.deltaY;
+			if (collage_scales[moving_image] > max_scale) {
+				collage_scales[moving_image] = max_scale;
+			}
+			if (collage_scales[moving_image] < min_scale) {
+				collage_scales[moving_image] = min_scale;
+			}
+			check_image_fit(moving_image);
+			draw(canvas, ctx);
 		}
-		if (collage_scales[moving_image] < min_scale) {
-			collage_scales[moving_image] = min_scale;
-		}
-		draw(canvas, ctx);
 	};
 	canvas.addEventListener('wheel',wheel_eventlistener,false);
 }

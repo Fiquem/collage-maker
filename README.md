@@ -13,11 +13,12 @@ i wanna make a collage
 - make page be nice to use
 - make work on mobile
 - add canvas size changer
-- stop images moving out of the collage box (e.g. scrolling to not fix box, moving outside bounds)
+- ~~stop images moving out of the collage box (e.g. scrolling to not fix box, moving outside bounds)~~
 
 ## bugs
 - ~~if image is smaller than canvas (or i mb area of canvas it's given?)~~
 - ~~scale doesn't focus currently hovered image, just last clicked~~
 - gets real slow with 9 medium-large images
-- the scroll doesn't actually choose correctly, gotta get that for canvas not window (scrolling down breaks)
+- ~~the scroll doesn't actually choose correctly, gotta get that for canvas not window (scrolling down breaks)~~
 - oh this is like full broken on pc
+- ~~moves slow when image is small~~
