@@ -65,11 +65,19 @@ function init() {
 	canvas.width = canvas_default_w;
 	canvas.height = canvas_default_h;
 
-	window.addEventListener('mousedown', function(event) {
+	// window.addEventListener('mousedown', function(event) {
+	// 	// console.log("mousedown")
+	// 	moving = true;
+	// 	last_x = event.offsetX;
+	// 	last_y = event.offsetY;
+	// 	// find img to move
+	// 	moving_image = which_image_clicked(mouse_pos);
+	// }, false);
+	canvas.addEventListener('mousedown', function(event) {
 		// console.log("mousedown")
 		moving = true;
-		last_x = event.offsetX;
-		last_y = event.offsetY;
+		last_x = event.clientX;
+		last_y = event.clientY;
 		// find img to move
 		moving_image = which_image_clicked(mouse_pos);
 	}, false);
@@ -80,7 +88,6 @@ function init() {
 	}, false);
 	window.addEventListener('mousemove', function(event) {
 		// console.log("mousemove")
-		mouse_pos = [event.clientX, event.clientY];
 		if (moving) {
 			// move if image to move
 			if (moving_image >= 0) {
@@ -103,6 +110,10 @@ function init() {
 				draw(canvas, ctx);
 			}
 		}
+	}, false);
+	canvas.addEventListener('mousemove', function(event) {
+		// console.log("mousemove")
+		mouse_pos = [event.offsetX, event.offsetY];
 	}, false);
 	var wheel_eventlistener = function(event) {
 		moving_image = which_image_clicked(mouse_pos);
